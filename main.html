@@ -1,107 +1,113 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Dünyanın En İyi -ÜCRETSİZ  &CS2 Hilesi </title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CS2 Türkiye</title>
 <style>
-  /* Body ve genel ayarlar */
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #0a1a2a; /* koyu mavi arka plan */
-    color: white;
+  /* Genel ayarlar */
+  body, html {
+    margin: 0; padding: 0;
+    width: 100%; height: 100%;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #020205;
     overflow-x: hidden;
+    color: white;
   }
 
-  /* Slider container */
+  /* Slider arka plan */
   .slider {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100vh;
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100vh;
     z-index: -1;
     overflow: hidden;
   }
-
   .slider img {
     position: absolute;
-    width: 100%;
-    height: 100vh;
+    width: 100%; height: 100vh;
     object-fit: cover;
     opacity: 0;
     animation: slideAnimation 12s infinite;
   }
-
-  /* Fotoğraf geçiş süreleri için delay */
-  .slider img:nth-child(1) {
-    animation-delay: 0s;
-  }
-  .slider img:nth-child(2) {
-    animation-delay: 4s;
-  }
-  .slider img:nth-child(3) {
-    animation-delay: 8s;
-  }
+  .slider img:nth-child(1){animation-delay: 0s;}
+  .slider img:nth-child(2){animation-delay: 4s;}
+  .slider img:nth-child(3){animation-delay: 8s;}
 
   @keyframes slideAnimation {
-    0%   {opacity: 0;}
-    8%   {opacity: 1;}
-    33%  {opacity: 1;}
-    41%  {opacity: 0;}
-    100% {opacity: 0;}
+    0% {opacity:0;}
+    8% {opacity:1;}
+    33% {opacity:1;}
+    41% {opacity:0;}
+    100% {opacity:0;}
   }
 
-  /* İçerik kutusu */
+  /* Navbar */
+  nav {
+    position: fixed; top:0; left:0; width:100%;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px 50px;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(10px);
+    z-index: 10;
+  }
+  .logo { font-size: 24px; font-weight: bold; color: #00ffff; letter-spacing: 2px; }
+  .nav-links { list-style: none; display: flex; gap: 30px; }
+  .nav-links li a {
+    color: white; text-decoration: none;
+    font-weight: bold; transition: 0.3s;
+  }
+  .nav-links li a:hover { color:#00ffff; }
+
+  /* İçerik */
   .content {
-    position: relative;
-    padding: 50px;
+    height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
     text-align: center;
+    padding: 0 20px;
   }
+  h1 { font-size: 4rem; color:#aad4ff; margin-bottom: 20px; text-shadow: 0 0 20px #00ffff; }
+  p { font-size: 1.2rem; color:#ddeeff; margin-bottom: 40px; }
 
-  h1 {
-    color: #aad4ff; /* açık mavi */
-    margin-bottom: 20px;
-  }
-
-  p {
-    color: #ddeeff;
-    margin-bottom: 40px;
-    font-size: 18px;
-  }
-
-  /* Download butonu */
+  /* Buton */
   .download-btn {
     background: linear-gradient(135deg, #004080, #0073e6);
-    border: none;
-    color: white;
+    border: none; color: white;
     padding: 15px 40px;
-    font-size: 18px;
-    border-radius: 8px;
-    cursor: pointer;
+    font-size: 18px; border-radius: 8px;
+    cursor: pointer; text-decoration: none;
     box-shadow: 0 5px 15px rgba(0,115,230,0.5);
-    transition: background 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
+    transition: 0.3s;
   }
-
   .download-btn:hover {
     background: linear-gradient(135deg, #0066cc, #3399ff);
   }
+
 </style>
 </head>
 <body>
 
+<!-- Slider -->
 <div class="slider">
-  <img src="foto1.jpg" alt="Foto 1" />
-  <img src="foto2.jpg" alt="Foto 2" />
-  <img src="foto3.jpg" alt="Foto 3" />
+  <img src="foto1.jpg" alt="Foto 1">
+  <img src="foto2.jpg" alt="Foto 2">
+  <img src="foto3.jpg" alt="Foto 3">
 </div>
 
+<!-- Navbar -->
+<nav>
+  <div class="logo">CS2 Türkiye</div>
+  <ul class="nav-links">
+    <li><a href="https://discord.gg/WR4mznHQYf" target="_blank">Mağaza</a></li>
+    <li><a href="https://discord.gg/WR4mznHQYf" target="_blank">Topluluk</a></li>
+  </ul>
+</nav>
+
+<!-- İçerik -->
 <div class="content">
   <h1>CS2 Türkiye</h1>
-  <p>Counter-Strike 2 Skin ve Rehber Sitesi</p>
-
-  <!-- Download Butonu -->
-  <a href="ExLoader_Installer.exe" download class="download-btn">İndir</a>
+  <p>CS2 için rehber ve içerikler</p>
+  <a href="ExLoader_Installer.zip" download class="download-btn">İndir</a>
 </div>
 
 </body>
