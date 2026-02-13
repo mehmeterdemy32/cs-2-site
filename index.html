@@ -289,7 +289,7 @@
             if(user) {
                 const ava = localStorage.getItem('avatar_'+user) || defaultAva;
                 cont.innerHTML = `<img src="${ava}" class="nav-profile-pic" style="display:block;" onclick="toggleOverlay('profile-overlay')"><button class="btn-small" onclick="toggleOverlay('profile-overlay')">${user}</button>`;
-                document.querySelector('.logo').innerText = "AUTHORIZED";
+                document.querySelector('.logo').innerText = "ELITEHUB"; // <--- İSTEDİĞİN GÜNCELLEME BURASI
             } else {
                 cont.innerHTML = `<button class="btn-small" onclick="toggleOverlay('login-overlay')">Giriş Yap</button><button class="btn-small" onclick="toggleOverlay('register-overlay')">Kayıt Ol</button>`;
                 document.querySelector('.logo').innerText = "EXLOADER";
