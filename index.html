@@ -252,7 +252,7 @@
             text-transform: uppercase;
         }
 
-        input {
+        input[type="text"], input[type="password"], input[type="email"] {
             width: 100%;
             padding: 12px;
             background: rgba(255,255,255,0.05);
@@ -265,6 +265,27 @@
         input:focus {
             border-color: var(--primary);
             background: rgba(255,0,0,0.05);
+        }
+
+        /* Custom File Upload */
+        .file-upload-label {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,0,0,0.1);
+            border: 1px dashed var(--primary);
+            color: #ccc;
+            text-align: center;
+            cursor: none;
+            transition: 0.3s;
+            font-size: 13px;
+        }
+        .file-upload-label:hover {
+            background: rgba(255,0,0,0.2);
+            color: white;
+        }
+        input[type="file"] {
+            display: none;
         }
 
         .main-btn {
@@ -369,7 +390,7 @@
         <div class="nav-items">
             <a href="#" class="nav-link">Ana Sayfa</a>
             <a href="javascript:void(0)" class="nav-link" onclick="toggleOverlay('store-overlay')">Mağaza</a>
-            <a href="#" class="nav-link">Topluluk</a>
+            <a href="https://discord.gg/spdrAVrfDM" target="_blank" class="nav-link">Topluluk</a>
             
             <div class="auth-buttons" id="auth-container">
                 <button class="btn-small" onclick="toggleOverlay('login-overlay')">Giriş Yap</button>
@@ -434,9 +455,11 @@
 
             <div class="section-title">PROFİL FOTOĞRAFI</div>
             <div class="form-group">
-                <label>Fotoğraf Linki (URL)</label>
-                <input type="text" id="new-avatar-url" placeholder="https://resim-linki.com/resim.jpg">
-                <button class="btn-small" style="margin-top:5px; width:100%;" onclick="updateProfilePic()">FOTOĞRAFI GÜNCELLE</button>
+                <label>Bilgisayardan Yükle</label>
+                <label for="file-upload" class="file-upload-label" id="file-label-text">
+                    [ RESİM SEÇMEK İÇİN TIKLA ]
+                </label>
+                <input type="file" id="file-upload" accept="image/*" onchange="handleFileUpload(this)">
             </div>
 
             <div class="section-title">GÜVENLİK AYARLARI</div>
@@ -483,6 +506,7 @@
 
     <script>
         // --- DEĞİŞKENLER VE AYARLAR ---
+        // Varsayılan boş resim
         const defaultAvatar = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
         
         // Sayfa Yüklendiğinde
@@ -512,7 +536,7 @@
         });
 
         // Buton efektleri
-        const interactables = document.querySelectorAll('button, a, input, .close-btn');
+        const interactables = document.querySelectorAll('button, a, input, .close-btn, .file-upload-label');
         interactables.forEach(el => {
             el.addEventListener('mouseenter', () => {
                 ring.style.width = '70px';
@@ -532,12 +556,9 @@
             if (el.style.display === 'flex') {
                 el.style.display = 'none';
             } else {
-                // Hepsini kapat
                 document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none');
-                // İsteneni aç
                 el.style.display = 'flex';
                 
-                // Eğer Profil açılıyorsa verileri yükle
                 if(id === 'profile-overlay') {
                     loadProfileData();
                 }
@@ -552,7 +573,6 @@
             setTimeout(() => n.style.display = 'none', 3000);
         }
 
-        // Giriş Durumunu Kontrol Et
         function checkLoginStatus() {
             const currentUser = localStorage.getItem('active_user');
             const authContainer = document.getElementById('auth-container');
@@ -576,7 +596,6 @@
             }
         }
 
-        // Kayıt Ol
         function handleRegister() {
             const user = document.getElementById('reg-user').value;
             const pass = document.getElementById('reg-pass').value;
@@ -587,7 +606,7 @@
                     return;
                 }
                 localStorage.setItem('pass_' + user, pass);
-                localStorage.setItem('avatar_' + user, defaultAvatar); // Varsayılan avatar ata
+                localStorage.setItem('avatar_' + user, defaultAvatar);
                 
                 showNotify("Kayıt Başarılı! Şimdi Giriş Yapın.");
                 toggleOverlay('register-overlay');
@@ -596,7 +615,6 @@
             }
         }
 
-        // Giriş Yap
         function handleLogin() {
             const user = document.getElementById('login-user').value;
             const pass = document.getElementById('login-pass').value;
@@ -604,16 +622,15 @@
             const storedPass = localStorage.getItem('pass_' + user);
 
             if(storedPass && storedPass === pass) {
-                localStorage.setItem('active_user', user); // Oturumu başlat
+                localStorage.setItem('active_user', user);
                 showNotify("Sisteme Erişildi. Hoş geldin " + user);
                 toggleOverlay('login-overlay');
-                checkLoginStatus(); // UI güncelle
+                checkLoginStatus();
             } else {
                 showNotify("Hatalı Kullanıcı Adı veya Şifre!");
             }
         }
 
-        // Çıkış Yap
         function logout() {
             localStorage.removeItem('active_user');
             showNotify("Sistemden Çıkış Yapıldı.");
@@ -621,31 +638,51 @@
             checkLoginStatus();
         }
 
-        // Profil Verilerini Yükle (Modal açılınca)
         function loadProfileData() {
             const user = localStorage.getItem('active_user');
             if(!user) return;
-
             const avatarUrl = localStorage.getItem('avatar_' + user) || defaultAvatar;
-            
             document.getElementById('profile-username').innerText = user;
             document.getElementById('profile-img-preview').src = avatarUrl;
         }
 
-        // Profil Resmi Güncelle
-        function updateProfilePic() {
+        // --- DOSYA YÜKLEME SİSTEMİ (Base64) ---
+        function handleFileUpload(input) {
             const user = localStorage.getItem('active_user');
-            const newUrl = document.getElementById('new-avatar-url').value;
+            if (!user) {
+                showNotify("Önce giriş yapmalısın!");
+                return;
+            }
 
-            if(newUrl && user) {
-                localStorage.setItem('avatar_' + user, newUrl);
-                document.getElementById('profile-img-preview').src = newUrl;
-                checkLoginStatus(); // Navbardaki resmi de güncelle
-                showNotify("Profil Fotoğrafı Güncellendi!");
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                
+                // Dosya boyutu kontrolü (örn: 2MB limit)
+                if (file.size > 2 * 1024 * 1024) {
+                    showNotify("Resim çok büyük! (Max 2MB)");
+                    return;
+                }
+
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const base64Image = e.target.result;
+                    
+                    try {
+                        localStorage.setItem('avatar_' + user, base64Image);
+                        document.getElementById('profile-img-preview').src = base64Image;
+                        document.getElementById('file-label-text').innerText = "YÜKLENDİ: " + file.name;
+                        checkLoginStatus(); // Navbardaki resmi güncelle
+                        showNotify("Profil resmi güncellendi!");
+                    } catch (err) {
+                        showNotify("Hata: Resim hafızaya sığmadı.");
+                    }
+                }
+
+                reader.readAsDataURL(file);
             }
         }
 
-        // Şifre Değiştirme
         function changePassword() {
             const user = localStorage.getItem('active_user');
             const oldPassInput = document.getElementById('old-pass').value;
@@ -653,35 +690,30 @@
             const newPassConfirm = document.getElementById('new-pass-confirm').value;
 
             if(!user) return;
-
             const realCurrentPass = localStorage.getItem('pass_' + user);
 
             if(oldPassInput !== realCurrentPass) {
                 showNotify("HATA: Eski şifreniz yanlış!");
                 return;
             }
-
             if(newPassInput.length < 3) {
                 showNotify("HATA: Yeni şifre çok kısa!");
                 return;
             }
-
             if(newPassInput !== newPassConfirm) {
                 showNotify("HATA: Yeni şifreler uyuşmuyor!");
                 return;
             }
 
-            // Her şey tamamsa
             localStorage.setItem('pass_' + user, newPassInput);
             showNotify("BAŞARILI: Şifreniz değiştirildi.");
             
-            // Inputları temizle
             document.getElementById('old-pass').value = "";
             document.getElementById('new-pass').value = "";
             document.getElementById('new-pass-confirm').value = "";
         }
 
-        // 4. ARKA PLAN PARTİKÜL SİSTEMİ (Canvas)
+        // 4. ARKA PLAN PARTİKÜL SİSTEMİ
         const canvas = document.getElementById('canvas-bg');
         const ctx = canvas.getContext('2d');
         let particles = [];
