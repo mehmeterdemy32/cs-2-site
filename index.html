@@ -142,6 +142,7 @@
             display: flex;
             gap: 15px;
             margin-left: 20px;
+            align-items: center;
         }
 
         .btn-small {
@@ -159,6 +160,19 @@
         .btn-small:hover {
             background: var(--primary);
             box-shadow: 0 0 15px var(--primary);
+        }
+
+        /* Profil Resmi Stili (Navbarda küçük) */
+        .nav-profile-pic {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            object-fit: cover;
+            display: none; /* JS ile açılacak */
+            cursor: none;
+            margin-right: 10px;
+            box-shadow: 0 0 10px var(--primary);
         }
 
         /* --- HERO SECTION --- */
@@ -270,6 +284,49 @@
             box-shadow: 0 0 30px var(--primary);
             transform: scale(1.02);
         }
+        
+        /* Danger button (Çıkış Yap) */
+        .btn-danger {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            margin-top: 20px;
+        }
+        .btn-danger:hover {
+            background: var(--dark-red);
+            color: white;
+        }
+
+        /* --- PROFILE CARD SPECIFIC --- */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,0,0,0.2);
+        }
+
+        .profile-avatar-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            object-fit: cover;
+        }
+
+        .profile-info h3 { margin: 0; font-size: 24px; color: white; }
+        .profile-info span { font-size: 12px; color: var(--primary); text-transform: uppercase; }
+
+        .section-title {
+            color: #fff;
+            font-size: 14px;
+            margin: 20px 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-left: 3px solid var(--primary);
+            padding-left: 10px;
+        }
 
         /* --- STORE SPECIFIC --- */
         #store-card {
@@ -295,6 +352,7 @@
             z-index: 10000;
             display: none;
             animation: fadeIn 0.3s;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
     </style>
 </head>
@@ -312,7 +370,8 @@
             <a href="#" class="nav-link">Ana Sayfa</a>
             <a href="javascript:void(0)" class="nav-link" onclick="toggleOverlay('store-overlay')">Mağaza</a>
             <a href="#" class="nav-link">Topluluk</a>
-            <div class="auth-buttons">
+            
+            <div class="auth-buttons" id="auth-container">
                 <button class="btn-small" onclick="toggleOverlay('login-overlay')">Giriş Yap</button>
                 <button class="btn-small" onclick="toggleOverlay('register-overlay')">Kayıt Ol</button>
             </div>
@@ -361,6 +420,45 @@
         </div>
     </div>
 
+    <div id="profile-overlay" class="overlay">
+        <div class="card">
+            <div class="close-btn" onclick="toggleOverlay('profile-overlay')">X</div>
+            
+            <div class="profile-header">
+                <img src="https://via.placeholder.com/80" alt="Avatar" id="profile-img-preview" class="profile-avatar-large">
+                <div class="profile-info">
+                    <h3 id="profile-username">Kullanıcı</h3>
+                    <span>Elite Üye</span>
+                </div>
+            </div>
+
+            <div class="section-title">PROFİL FOTOĞRAFI</div>
+            <div class="form-group">
+                <label>Fotoğraf Linki (URL)</label>
+                <input type="text" id="new-avatar-url" placeholder="https://resim-linki.com/resim.jpg">
+                <button class="btn-small" style="margin-top:5px; width:100%;" onclick="updateProfilePic()">FOTOĞRAFI GÜNCELLE</button>
+            </div>
+
+            <div class="section-title">GÜVENLİK AYARLARI</div>
+            <div class="form-group">
+                <label>Eski Şifre</label>
+                <input type="password" id="old-pass">
+            </div>
+            <div class="form-group">
+                <label>Yeni Şifre</label>
+                <input type="password" id="new-pass">
+            </div>
+            <div class="form-group">
+                <label>Yeni Şifre Tekrar</label>
+                <input type="password" id="new-pass-confirm">
+            </div>
+            
+            <button class="main-btn" onclick="changePassword()">[ONAYLIYORUM]</button>
+
+            <button class="main-btn btn-danger" onclick="logout()">OTURUMU KAPAT</button>
+        </div>
+    </div>
+
     <div id="store-overlay" class="overlay">
         <div class="card" id="store-card">
             <div class="close-btn" onclick="toggleOverlay('store-overlay')">X</div>
@@ -368,7 +466,7 @@
                 <h2>ExLoader v5</h2>
                 <div class="product-price">ÜCRETSİZ</div>
                 <ul class="features">
-                    <li>Virüs Riski Olmadan Güvenli Kulanım</li>
+                    <li>Virüs Riski Olmadan Güvenli Kullanım</li>
                     <li>%0 Performans Kaybı</li>
                     <li>VacBan Korumalı Hile</li>
                     <li>7/24 Teknik Destek</li>
@@ -384,6 +482,14 @@
     <div id="notification"></div>
 
     <script>
+        // --- DEĞİŞKENLER VE AYARLAR ---
+        const defaultAvatar = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
+        
+        // Sayfa Yüklendiğinde
+        window.onload = function() {
+            checkLoginStatus();
+        }
+
         // 1. MOUSE TAKİP SİSTEMİ
         const cursor = document.querySelector('.cursor');
         const ring = document.querySelector('.cursor-ring');
@@ -396,7 +502,6 @@
             cursor.style.left = x + 'px';
             cursor.style.top = y + 'px';
             
-            // Ring biraz gecikmeli takip eder (akıcılık için)
             ring.animate({
                 left: x + 'px',
                 top: y + 'px'
@@ -427,13 +532,19 @@
             if (el.style.display === 'flex') {
                 el.style.display = 'none';
             } else {
-                // Tüm diğerlerini kapat
+                // Hepsini kapat
                 document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none');
+                // İsteneni aç
                 el.style.display = 'flex';
+                
+                // Eğer Profil açılıyorsa verileri yükle
+                if(id === 'profile-overlay') {
+                    loadProfileData();
+                }
             }
         }
 
-        // 3. DATABASE (LOCALSTORAGE) MANTIĞI
+        // 3. DATABASE VE HESAP YÖNETİMİ
         function showNotify(msg) {
             const n = document.getElementById('notification');
             n.innerText = msg;
@@ -441,13 +552,43 @@
             setTimeout(() => n.style.display = 'none', 3000);
         }
 
+        // Giriş Durumunu Kontrol Et
+        function checkLoginStatus() {
+            const currentUser = localStorage.getItem('active_user');
+            const authContainer = document.getElementById('auth-container');
+
+            if (currentUser) {
+                // Giriş yapılmışsa
+                const savedAvatar = localStorage.getItem('avatar_' + currentUser) || defaultAvatar;
+                
+                authContainer.innerHTML = `
+                    <img src="${savedAvatar}" class="nav-profile-pic" style="display:block;" onclick="toggleOverlay('profile-overlay')">
+                    <button class="btn-small" onclick="toggleOverlay('profile-overlay')">${currentUser}</button>
+                `;
+                document.querySelector('.logo').innerText = "AUTHORIZED";
+            } else {
+                // Çıkış yapılmışsa
+                authContainer.innerHTML = `
+                    <button class="btn-small" onclick="toggleOverlay('login-overlay')">Giriş Yap</button>
+                    <button class="btn-small" onclick="toggleOverlay('register-overlay')">Kayıt Ol</button>
+                `;
+                document.querySelector('.logo').innerText = "EXLOADER";
+            }
+        }
+
+        // Kayıt Ol
         function handleRegister() {
             const user = document.getElementById('reg-user').value;
             const pass = document.getElementById('reg-pass').value;
             
             if(user && pass) {
-                localStorage.setItem('db_user', user);
-                localStorage.setItem('db_pass', pass);
+                if(localStorage.getItem('pass_' + user)) {
+                    showNotify("Bu kullanıcı adı zaten alınmış!");
+                    return;
+                }
+                localStorage.setItem('pass_' + user, pass);
+                localStorage.setItem('avatar_' + user, defaultAvatar); // Varsayılan avatar ata
+                
                 showNotify("Kayıt Başarılı! Şimdi Giriş Yapın.");
                 toggleOverlay('register-overlay');
             } else {
@@ -455,20 +596,89 @@
             }
         }
 
+        // Giriş Yap
         function handleLogin() {
             const user = document.getElementById('login-user').value;
             const pass = document.getElementById('login-pass').value;
             
-            const db_u = localStorage.getItem('db_user');
-            const db_p = localStorage.getItem('db_pass');
+            const storedPass = localStorage.getItem('pass_' + user);
 
-            if(user === db_u && pass === db_p) {
+            if(storedPass && storedPass === pass) {
+                localStorage.setItem('active_user', user); // Oturumu başlat
                 showNotify("Sisteme Erişildi. Hoş geldin " + user);
                 toggleOverlay('login-overlay');
-                document.querySelector('.logo').innerText = "AUTHORIZED";
+                checkLoginStatus(); // UI güncelle
             } else {
-                showNotify("Erişim Reddedildi! Bilgileri Kontrol Et.");
+                showNotify("Hatalı Kullanıcı Adı veya Şifre!");
             }
+        }
+
+        // Çıkış Yap
+        function logout() {
+            localStorage.removeItem('active_user');
+            showNotify("Sistemden Çıkış Yapıldı.");
+            toggleOverlay('profile-overlay');
+            checkLoginStatus();
+        }
+
+        // Profil Verilerini Yükle (Modal açılınca)
+        function loadProfileData() {
+            const user = localStorage.getItem('active_user');
+            if(!user) return;
+
+            const avatarUrl = localStorage.getItem('avatar_' + user) || defaultAvatar;
+            
+            document.getElementById('profile-username').innerText = user;
+            document.getElementById('profile-img-preview').src = avatarUrl;
+        }
+
+        // Profil Resmi Güncelle
+        function updateProfilePic() {
+            const user = localStorage.getItem('active_user');
+            const newUrl = document.getElementById('new-avatar-url').value;
+
+            if(newUrl && user) {
+                localStorage.setItem('avatar_' + user, newUrl);
+                document.getElementById('profile-img-preview').src = newUrl;
+                checkLoginStatus(); // Navbardaki resmi de güncelle
+                showNotify("Profil Fotoğrafı Güncellendi!");
+            }
+        }
+
+        // Şifre Değiştirme
+        function changePassword() {
+            const user = localStorage.getItem('active_user');
+            const oldPassInput = document.getElementById('old-pass').value;
+            const newPassInput = document.getElementById('new-pass').value;
+            const newPassConfirm = document.getElementById('new-pass-confirm').value;
+
+            if(!user) return;
+
+            const realCurrentPass = localStorage.getItem('pass_' + user);
+
+            if(oldPassInput !== realCurrentPass) {
+                showNotify("HATA: Eski şifreniz yanlış!");
+                return;
+            }
+
+            if(newPassInput.length < 3) {
+                showNotify("HATA: Yeni şifre çok kısa!");
+                return;
+            }
+
+            if(newPassInput !== newPassConfirm) {
+                showNotify("HATA: Yeni şifreler uyuşmuyor!");
+                return;
+            }
+
+            // Her şey tamamsa
+            localStorage.setItem('pass_' + user, newPassInput);
+            showNotify("BAŞARILI: Şifreniz değiştirildi.");
+            
+            // Inputları temizle
+            document.getElementById('old-pass').value = "";
+            document.getElementById('new-pass').value = "";
+            document.getElementById('new-pass-confirm').value = "";
         }
 
         // 4. ARKA PLAN PARTİKÜL SİSTEMİ (Canvas)
