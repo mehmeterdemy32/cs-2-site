@@ -3,79 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExLoader - Elite Gaming</title>
+    <title>ExLoader | Premium Gaming Interface</title>
     <style>
+        /* --- CSS VARIABLES & RESET --- */
         :root {
-            --primary-red: #ff0000;
-            --dark-red: #8b0000;
-            --bg-color: #050000;
-            --text-color: #ffffff;
+            --primary: #ff0000;
+            --dark-red: #4d0000;
+            --bg: #030303;
+            --card-bg: rgba(15, 2, 2, 0.95);
+            --border: 1px solid rgba(255, 0, 0, 0.3);
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             --mouse-x: 50%;
             --mouse-y: 50%;
         }
 
-        body {
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body, html {
             margin: 0;
             padding: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Arial Black', Impact, sans-serif;
-            overflow: hidden; /* Kaydırmayı tamamen kapattık */
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg);
+            color: white;
+            font-family: var(--font-main);
+            overflow: hidden; /* Scroll tamamen kapalı */
             cursor: none;
-            
-            background-image: radial-gradient(
-                circle 600px at var(--mouse-x) var(--mouse-y), 
-                rgba(255, 0, 0, 0.15) 0%, 
-                rgba(139, 0, 0, 0.05) 30%,
-                rgba(0, 0, 0, 1) 70%
-            );
-            background-attachment: fixed;
-            height: 100vh;
         }
 
-        .cursor-dot {
-            width: 8px;
-            height: 8px;
-            background-color: var(--primary-red);
+        /* --- BACKGROUND EFFECTS --- */
+        #canvas-bg {
+            position: fixed;
+            top: 0; left: 0;
+            z-index: -2;
+        }
+
+        .spotlight {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background: radial-gradient(
+                circle 450px at var(--mouse-x) var(--mouse-y), 
+                rgba(255, 0, 0, 0.12) 0%, 
+                transparent 80%
+            );
+        }
+
+        /* --- CUSTOM CURSOR --- */
+        .cursor {
+            width: 10px;
+            height: 10px;
+            background: var(--primary);
             border-radius: 50%;
             position: fixed;
-            top: 0;
-            left: 0;
             pointer-events: none;
-            z-index: 10001;
-            box-shadow: 0 0 15px var(--primary-red), 0 0 30px var(--primary-red);
+            z-index: 99999;
+            box-shadow: 0 0 20px var(--primary), 0 0 40px var(--primary);
+            transform: translate(-50%, -50%);
         }
 
-        .bg-texture {
+        .cursor-ring {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://www.transparenttextures.com/patterns/carbon-fibre-v2.png');
-            opacity: 0.3;
-            z-index: -1;
             pointer-events: none;
+            z-index: 99998;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s, opacity 0.3s;
+            opacity: 0.5;
         }
 
+        /* --- NAVIGATION --- */
         nav {
+            height: 80px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 50px;
-            background: rgba(5, 0, 0, 0.9);
-            border-bottom: 2px solid var(--dark-red);
+            padding: 0 60px;
+            border-bottom: var(--border);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
             position: relative;
-            z-index: 100;
+            z-index: 1000;
         }
 
         .logo {
-            font-size: 28px;
+            font-size: 30px;
             font-weight: 900;
-            color: var(--primary-red);
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            text-shadow: 0 0 10px var(--dark-red);
+            letter-spacing: 5px;
+            color: var(--primary);
+            text-shadow: 0 0 15px var(--primary);
         }
 
-        /* --- ANA İÇERİK --- */
+        .nav-items {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #ccc;
+            font-size: 13px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            position: relative;
+            padding: 5px 0;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 0; height: 2px;
+            background: var(--primary);
+            transition: 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+            margin-left: 20px;
+        }
+
+        .btn-small {
+            padding: 8px 20px;
+            border: 1px solid var(--primary);
+            background: transparent;
+            color: white;
+            text-transform: uppercase;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: none;
+            transition: 0.3s;
+        }
+
+        .btn-small:hover {
+            background: var(--primary);
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        /* --- HERO SECTION --- */
         .hero {
             height: calc(100vh - 80px);
             display: flex;
@@ -85,136 +171,360 @@
             text-align: center;
         }
 
-        h1 {
-            font-size: 5rem;
+        .hero h1 {
+            font-size: 100px;
             margin: 0;
+            line-height: 0.9;
+            background: linear-gradient(to bottom, #fff, #666);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 30px rgba(255,0,0,0.5));
+        }
+
+        .hero p {
+            color: #888;
+            letter-spacing: 8px;
             text-transform: uppercase;
-            text-shadow: 3px 3px 0px var(--dark-red), 0 0 30px var(--primary-red);
+            margin-top: 20px;
         }
 
-        .btn {
-            padding: 15px 40px;
-            font-size: 20px;
-            font-weight: bold;
-            text-decoration: none;
-            text-transform: uppercase;
-            border: none;
-            cursor: none;
-            transition: all 0.3s ease;
-            display: inline-block;
-            background: linear-gradient(45deg, var(--dark-red), var(--primary-red));
-            color: var(--text-color);
-            box-shadow: 0 0 15px var(--dark-red);
-            clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%);
-            margin-top: 30px;
-        }
-
-        .btn:hover {
-            transform: scale(1.1) skewX(-5deg);
-            box-shadow: 0 0 30px var(--primary-red);
-        }
-
-        /* --- GİZLİ MAĞAZA (OVERLAY) --- */
-        #store-overlay {
+        /* --- OVERLAY SYSTEM (MODALS) --- */
+        .overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(5, 0, 0, 0.95);
-            z-index: 10000;
-            display: none; /* Başlangıçta gizli */
-            flex-direction: column;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            display: none; /* JS ile açılacak */
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(10px);
-            animation: fadeIn 0.5s ease;
+            backdrop-filter: blur(15px);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .store-card {
-            background: linear-gradient(135deg, #1a0000, #000);
-            border: 2px solid var(--primary-red);
+        .card {
+            background: var(--card-bg);
+            border: 2px solid var(--primary);
+            width: 450px;
             padding: 50px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 0 50px rgba(255, 0, 0, 0.3);
+            position: relative;
+            box-shadow: 0 0 50px rgba(255,0,0,0.2);
+            animation: slideUp 0.4s ease-out;
         }
 
-        .close-store {
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close-btn {
             position: absolute;
-            top: 30px;
-            right: 50px;
-            color: var(--primary-red);
+            top: 20px; right: 20px;
+            color: var(--primary);
             font-size: 20px;
-            text-decoration: underline;
+            font-weight: bold;
             cursor: none;
         }
 
-        /* --- MOBİL --- */
-        @media (max-width: 768px) {
-            h1 { font-size: 2.5rem; }
-            .store-card { width: 80%; padding: 20px; }
+        /* --- FORM STYLES --- */
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            color: var(--primary);
+            font-size: 12px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,0,0,0.2);
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            background: rgba(255,0,0,0.05);
+        }
+
+        .main-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: none;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+
+        .main-btn:hover {
+            box-shadow: 0 0 30px var(--primary);
+            transform: scale(1.02);
+        }
+
+        /* --- STORE SPECIFIC --- */
+        #store-card {
+            width: 800px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .product-info h2 { color: var(--primary); font-size: 35px; margin: 0; }
+        .product-price { font-size: 24px; margin: 15px 0; color: #fff; }
+        .features { list-style: none; padding: 0; color: #aaa; font-size: 14px; }
+        .features li { margin-bottom: 10px; border-left: 2px solid var(--primary); padding-left: 10px; }
+
+        /* --- NOTIFICATION --- */
+        #notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary);
+            padding: 15px 30px;
+            font-weight: bold;
+            z-index: 10000;
+            display: none;
+            animation: fadeIn 0.3s;
         }
     </style>
 </head>
 <body>
 
-    <div class="cursor-dot"></div>
-    <div class="bg-texture"></div>
+    <canvas id="canvas-bg"></canvas>
+    <div class="spotlight"></div>
+
+    <div class="cursor"></div>
+    <div class="cursor-ring"></div>
 
     <nav>
         <div class="logo">EXLOADER</div>
+        <div class="nav-items">
+            <a href="#" class="nav-link">Ana Sayfa</a>
+            <a href="javascript:void(0)" class="nav-link" onclick="toggleOverlay('store-overlay')">Mağaza</a>
+            <a href="#" class="nav-link">Topluluk</a>
+            <div class="auth-buttons">
+                <button class="btn-small" onclick="toggleOverlay('login-overlay')">Giriş Yap</button>
+                <button class="btn-small" onclick="toggleOverlay('register-overlay')">Kayıt Ol</button>
+            </div>
+        </div>
     </nav>
 
     <div class="hero">
-        <h1>SİSTEME <span style="color: var(--primary-red);">SIZ</span></h1>
-        <p style="color: #aaa; font-size: 1.2rem;">En üst düzey deneyim için mağazayı ziyaret et.</p>
-        <button class="btn" onclick="openStore()">MAĞAZAYA GİT</button>
+        <p>Geleceğin Teknolojisi Burada</p>
+        <h1>ELITE HUB</h1>
+        <button class="main-btn" style="width: 250px;" onclick="toggleOverlay('store-overlay')">Hemen Keşfet</button>
     </div>
 
-    <div id="store-overlay">
-        <div class="close-store" onclick="closeStore()">[ KAPAT ]</div>
-        <div class="store-card">
-            <h2 style="color: var(--primary-red); font-size: 2.5rem; margin-top: 0;">MAĞAZA</h2>
-            <p style="color: #ccc; font-family: monospace; margin-bottom: 30px;">EXLOADER ULTIMATE SÜRÜMÜ</p>
-            <a href="https://data.exloader.net/ExLoader_Installer.exe" class="btn">
-                ÜCRETSİZ İNDİR
-            </a>
+    <div id="login-overlay" class="overlay">
+        <div class="card">
+            <div class="close-btn" onclick="toggleOverlay('login-overlay')">X</div>
+            <h2 style="color: var(--primary);">GİRİŞ YAP</h2>
+            <div class="form-group">
+                <label>Kullanıcı Adı</label>
+                <input type="text" id="login-user" placeholder="Admin">
+            </div>
+            <div class="form-group">
+                <label>Şifre</label>
+                <input type="password" id="login-pass" placeholder="••••••">
+            </div>
+            <button class="main-btn" onclick="handleLogin()">Sisteme Gir</button>
         </div>
     </div>
 
+    <div id="register-overlay" class="overlay">
+        <div class="card">
+            <div class="close-btn" onclick="toggleOverlay('register-overlay')">X</div>
+            <h2 style="color: var(--primary);">KAYIT OL</h2>
+            <div class="form-group">
+                <label>E-posta</label>
+                <input type="email" id="reg-email" placeholder="mail@example.com">
+            </div>
+            <div class="form-group">
+                <label>Kullanıcı Adı</label>
+                <input type="text" id="reg-user" placeholder="Username">
+            </div>
+            <div class="form-group">
+                <label>Şifre</label>
+                <input type="password" id="reg-pass" placeholder="••••••">
+            </div>
+            <button class="main-btn" onclick="handleRegister()">Hesap Oluştur</button>
+        </div>
+    </div>
+
+    <div id="store-overlay" class="overlay">
+        <div class="card" id="store-card">
+            <div class="close-btn" onclick="toggleOverlay('store-overlay')">X</div>
+            <div class="product-info">
+                <h2>ExLoader v5</h2>
+                <div class="product-price">ÜCRETSİZ</div>
+                <ul class="features">
+                    <li>Gelişmiş Kernel Sürücüsü</li>
+                    <li>%0 Performans Kaybı</li>
+                    <li>256-bit Şifreleme</li>
+                    <li>7/24 Teknik Destek</li>
+                </ul>
+            </div>
+            <div style="display: flex; flex-direction: column; justify-content: center;">
+                <p style="font-size: 12px; color: #666;">En güncel sürümü indirmek için aşağıdaki butonu kullanın.</p>
+                <a href="https://data.exloader.net/ExLoader_Installer.exe" class="main-btn" style="text-align: center; text-decoration: none;">Ücretsiz İndir</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification"></div>
+
     <script>
-        const cursorDot = document.querySelector('.cursor-dot');
+        // 1. MOUSE TAKİP SİSTEMİ
+        const cursor = document.querySelector('.cursor');
+        const ring = document.querySelector('.cursor-ring');
         const root = document.documentElement;
-        const store = document.getElementById('store-overlay');
 
-        // Mouse takibi
         document.addEventListener('mousemove', (e) => {
-            root.style.setProperty('--mouse-x', e.clientX + 'px');
-            root.style.setProperty('--mouse-y', e.clientY + 'px');
-            cursorDot.style.left = `${e.clientX - 4}px`;
-            cursorDot.style.top = `${e.clientY - 4}px`;
+            const x = e.clientX;
+            const y = e.clientY;
+
+            cursor.style.left = x + 'px';
+            cursor.style.top = y + 'px';
+            
+            // Ring biraz gecikmeli takip eder (akıcılık için)
+            ring.animate({
+                left: x + 'px',
+                top: y + 'px'
+            }, { duration: 500, fill: "forwards" });
+
+            root.style.setProperty('--mouse-x', x + 'px');
+            root.style.setProperty('--mouse-y', y + 'px');
         });
 
-        // Mağaza Fonksiyonları
-        function openStore() {
-            store.style.display = 'flex';
-        }
-
-        function closeStore() {
-            store.style.display = 'none';
-        }
-
-        // Mouse büyüme efekti
-        document.querySelectorAll('button, a, .close-store').forEach(el => {
-            el.addEventListener('mouseenter', () => cursorDot.style.transform = "scale(3)");
-            el.addEventListener('mouseleave', () => cursorDot.style.transform = "scale(1)");
+        // Buton efektleri
+        const interactables = document.querySelectorAll('button, a, input, .close-btn');
+        interactables.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                ring.style.width = '70px';
+                ring.style.height = '70px';
+                ring.style.borderColor = '#fff';
+            });
+            el.addEventListener('mouseleave', () => {
+                ring.style.width = '40px';
+                ring.style.height = '40px';
+                ring.style.borderColor = 'var(--primary)';
+            });
         });
+
+        // 2. MODAL YÖNETİMİ
+        function toggleOverlay(id) {
+            const el = document.getElementById(id);
+            if (el.style.display === 'flex') {
+                el.style.display = 'none';
+            } else {
+                // Tüm diğerlerini kapat
+                document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none');
+                el.style.display = 'flex';
+            }
+        }
+
+        // 3. DATABASE (LOCALSTORAGE) MANTIĞI
+        function showNotify(msg) {
+            const n = document.getElementById('notification');
+            n.innerText = msg;
+            n.style.display = 'block';
+            setTimeout(() => n.style.display = 'none', 3000);
+        }
+
+        function handleRegister() {
+            const user = document.getElementById('reg-user').value;
+            const pass = document.getElementById('reg-pass').value;
+            
+            if(user && pass) {
+                localStorage.setItem('db_user', user);
+                localStorage.setItem('db_pass', pass);
+                showNotify("Kayıt Başarılı! Şimdi Giriş Yapın.");
+                toggleOverlay('register-overlay');
+            } else {
+                showNotify("Lütfen tüm alanları doldurun!");
+            }
+        }
+
+        function handleLogin() {
+            const user = document.getElementById('login-user').value;
+            const pass = document.getElementById('login-pass').value;
+            
+            const db_u = localStorage.getItem('db_user');
+            const db_p = localStorage.getItem('db_pass');
+
+            if(user === db_u && pass === db_p) {
+                showNotify("Sisteme Erişildi. Hoş geldin " + user);
+                toggleOverlay('login-overlay');
+                document.querySelector('.logo').innerText = "AUTHORIZED";
+            } else {
+                showNotify("Erişim Reddedildi! Bilgileri Kontrol Et.");
+            }
+        }
+
+        // 4. ARKA PLAN PARTİKÜL SİSTEMİ (Canvas)
+        const canvas = document.getElementById('canvas-bg');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            for (let i = 0; i < 100; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
     </script>
 </body>
 </html>
