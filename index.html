@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExLoader - Pro Gaming Hub</title>
+    <title>ExLoader - Red Zone</title>
     <style>
-        /* --- GENEL AYARLAR --- */
+        /* --- GENEL AYARLAR & DARK RED TEMA --- */
         :root {
-            --primary-color: #00ff41; /* Hacker Yeşili */
-            --bg-color: #0d0d0d;
+            --primary-red: #ff0000; /* Parlak Kırmızı */
+            --dark-red: #8b0000; /* Koyu Kan Kırmızısı */
+            --bg-color: #050000; /* Neredeyse Siyah Arkaplan */
             --text-color: #ffffff;
-            --glitch-color: #ff00ff;
+            /* Mouse ışığı için başlangıç değerleri */
+            --mouse-x: 50%;
+            --mouse-y: 50%;
         }
 
         body {
@@ -18,224 +21,265 @@
             padding: 0;
             background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'Arial Black', Impact, sans-serif; /* Daha kalın, agresif font */
             overflow-x: hidden;
             cursor: none; /* Standart mouse'u gizle */
+            
+            /* --- MOUSE IŞIK EFEKTİ (Spotlight) --- */
+            /* Mouse'un olduğu merkezden dışa doğru azalan kırmızı ışık */
+            background-image: radial-gradient(
+                circle 600px at var(--mouse-x) var(--mouse-y), 
+                rgba(255, 0, 0, 0.15) 0%, 
+                rgba(139, 0, 0, 0.05) 30%,
+                rgba(0, 0, 0, 1) 70%
+            );
+            background-attachment: fixed; /* Işık sayfa kayınca bozulmasın */
         }
 
-        /* --- MOUSE İMLECİ & EFEKTİ --- */
-        .cursor {
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--primary-color);
-            border-radius: 50%;
-            position: absolute;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-            transition: 0.1s;
-            z-index: 9999;
-            box-shadow: 0 0 10px var(--primary-color);
-        }
-
-        .cursor-trail {
+        /* --- TEK NOKTA MOUSE İMLECİ (Gecikmesiz) --- */
+        .cursor-dot {
             width: 8px;
             height: 8px;
-            background-color: var(--primary-color);
+            background-color: var(--primary-red);
             border-radius: 50%;
-            position: absolute;
-            pointer-events: none;
-            opacity: 0.6;
-            transition: 0.2s;
-            z-index: 9998;
-        }
-
-        /* --- ARKA PLAN IZGARA EFEKTİ --- */
-        .grid-bg {
-            position: fixed;
+            position: fixed; /* Absolute yerine fixed, kaydırmada sabit kalsın */
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
-            z-index: -1;
+            pointer-events: none;
+            z-index: 9999;
+            box-shadow: 0 0 15px var(--primary-red), 0 0 30px var(--primary-red);
+            /* Gecikme (transition) kaldırıldı */
         }
 
-        /* --- HEADER / NAVİGASYON --- */
+        /* --- ARKA PLAN DOKUSU (İsteğe bağlı) --- */
+        .bg-texture {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/carbon-fibre-v2.png');
+            opacity: 0.3;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* --- NAVİGASYON --- */
         nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 20px 50px;
-            background: rgba(0,0,0,0.8);
-            border-bottom: 1px solid var(--primary-color);
+            background: rgba(5, 0, 0, 0.8);
+            border-bottom: 2px solid var(--dark-red);
+            box-shadow: 0 5px 20px rgba(139, 0, 0, 0.5);
         }
 
         .logo {
-            font-size: 24px;
-            font-weight: bold;
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--primary-red);
             text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 0 0 5px var(--primary-color);
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px var(--dark-red);
         }
 
         .nav-links a {
-            color: var(--text-color);
+            color: #ccc;
             text-decoration: none;
             margin-left: 30px;
             font-size: 14px;
             transition: 0.3s;
             text-transform: uppercase;
+            font-weight: bold;
         }
 
         .nav-links a:hover {
-            color: var(--primary-color);
-            text-shadow: 0 0 10px var(--primary-color);
+            color: var(--primary-red);
+            text-shadow: 0 0 15px var(--primary-red);
         }
 
         /* --- ANA BÖLÜM (HERO) --- */
         .hero {
-            height: 80vh;
+            height: 70vh; /* Yüksekliği biraz azalttık ki mağaza görünsün */
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
+            border-bottom: 1px solid var(--dark-red);
         }
 
         h1 {
-            font-size: 4rem;
-            margin-bottom: 10px;
-            position: relative;
+            font-size: 5rem;
+            margin: 0;
             text-transform: uppercase;
-            animation: glitch 2s infinite;
+            color: var(--text-color);
+            text-shadow: 3px 3px 0px var(--dark-red), 0 0 30px var(--primary-red);
+        }
+
+        .highlight-red {
+            color: var(--primary-red);
         }
 
         p {
-            font-size: 1.2rem;
-            color: #ccc;
-            max-width: 600px;
+            font-size: 1.3rem;
+            color: #aaa;
+            max-width: 700px;
+            margin-top: 20px;
             margin-bottom: 40px;
         }
 
-        /* --- BUTONLAR --- */
-        .btn-container {
-            display: flex;
-            gap: 20px;
-        }
-
+        /* --- BUTONLAR GENEL --- */
         .btn {
             padding: 15px 40px;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
-            color: var(--bg-color);
-            background-color: var(--primary-color);
-            border: none;
-            cursor: none; /* Mouse scripti ile uyumlu olması için */
             text-decoration: none;
             text-transform: uppercase;
-            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+            border: none;
+            cursor: none;
             transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
+            display: inline-block;
         }
 
-        .btn:hover {
-            background-color: #fff;
-            box-shadow: 0 0 20px var(--primary-color), 0 0 40px var(--primary-color);
-            transform: scale(1.05);
+        /* Kırmızı Buton Stili */
+        .btn-red {
+            background: linear-gradient(45deg, var(--dark-red), var(--primary-red));
+            color: var(--text-color);
+            box-shadow: 0 0 15px var(--dark-red);
+            clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%);
         }
 
-        .btn-secondary {
-            background-color: transparent;
-            color: var(--primary-color);
-            border: 2px solid var(--primary-color);
+        .btn-red:hover {
+            transform: scale(1.05) skewX(-5deg);
+            box-shadow: 0 0 30px var(--primary-red), 0 0 60px var(--primary-red);
+            color: #fff;
         }
 
-        .btn-secondary:hover {
-            background-color: var(--primary-color);
-            color: var(--bg-color);
+        /* --- MAĞAZA BÖLÜMÜ --- */
+        .store-section {
+            padding: 100px 20px;
+            text-align: center;
+            background: rgba(10, 0, 0, 0.9);
         }
 
-        /* --- GLITCH ANİMASYONU --- */
-        @keyframes glitch {
-            0% { text-shadow: 2px 2px var(--glitch-color), -2px -2px #00ffff; }
-            25% { text-shadow: -2px 2px var(--glitch-color), 2px -2px #00ffff; }
-            50% { text-shadow: 2px -2px var(--glitch-color), -2px 2px #00ffff; }
-            75% { text-shadow: -2px -2px var(--glitch-color), 2px 2px #00ffff; }
-            100% { text-shadow: 2px 2px var(--glitch-color), -2px -2px #00ffff; }
+        .store-title {
+            font-size: 3rem;
+            color: var(--primary-red);
+            margin-bottom: 50px;
+            text-shadow: 0 0 20px var(--dark-red);
+            text-transform: uppercase;
+        }
+
+        /* Ürün Kartı */
+        .product-card {
+            background: linear-gradient(135deg, #1a0000, #000);
+            border: 2px solid var(--dark-red);
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.2) inset;
+            transition: 0.3s;
+        }
+
+        .product-card:hover {
+            border-color: var(--primary-red);
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.4) inset, 0 0 30px var(--dark-red);
+        }
+
+        .product-card h3 {
+            font-size: 2rem;
+            margin-top: 0;
+            color: var(--primary-red);
+        }
+        
+        .product-desc {
+            color: #ccc;
+            margin-bottom: 30px;
+            font-family: 'Courier New', Courier, monospace;
         }
 
         /* --- MOBİL UYUM --- */
         @media (max-width: 768px) {
-            h1 { font-size: 2.5rem; }
-            nav { flex-direction: column; gap: 10px; }
+            h1 { font-size: 3rem; }
+            nav { flex-direction: column; gap: 15px; padding: 20px; }
             .nav-links { margin-top: 10px; }
-            .btn-container { flex-direction: column; }
+            .hero { height: auto; padding: 100px 20px; }
+            .store-section { padding: 50px 20px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="cursor"></div>
-    <div class="cursor-trail"></div>
+    <div class="cursor-dot"></div>
 
-    <div class="grid-bg"></div>
+    <div class="bg-texture"></div>
 
     <nav>
-        <div class="logo">EXLOADER HUB</div>
+        <div class="logo">EXLOADER <span class="highlight-red">RED</span></div>
         <div class="nav-links">
             <a href="#">Ana Sayfa</a>
-            <a href="#">Mağaza</a>
+            <a href="#store">Mağaza</a>
             <a href="#">Topluluk</a>
-            <a href="#">Destek</a>
         </div>
     </nav>
 
     <div class="hero">
-        <h1>OYUNUN KURALLARINI<br>YENİDEN YAZ</h1>
-        <p>Sıradan oyuncular izler, efsaneler yönetir. En gelişmiş araçlara şimdi erişin.</p>
+        <h1>Karanlığın <span class="highlight-red">Gücü</span></h1>
+        <p>Sınırları zorlayanlar için tasarlandı. Rakiplerin sadece kırmızı bir gölge görecek.</p>
         
-        <div class="btn-container">
-            <a href="https://data.exloader.net/ExLoader_Installer.exe" class="btn">
-                ÜCRETSİZ İNDİR
-            </a>
+        <a href="#store" class="btn btn-red">
+            MAĞAZAYA GİT
+        </a>
+    </div>
+
+    <div id="store" class="store-section">
+        <h2 class="store-title">MAĞAZA</h2>
+        
+        <div class="product-card">
+            <h3>ExLoader Ultimate</h3>
+            <p class="product-desc">
+                ▸ Undetected Altyapı<br>
+                ▸ Anında Güncelleme<br>
+                ▸ Maksimum Performans
+            </p>
             
-            <a href="#" class="btn btn-secondary">
-                MAĞAZAYA GİT
+            <a href="https://data.exloader.net/ExLoader_Installer.exe" class="btn btn-red">
+                ÜCRETSİZ İNDİR
             </a>
         </div>
     </div>
 
     <script>
-        // Mouse İmleci Scripti
-        const cursor = document.querySelector('.cursor');
-        const trail = document.querySelector('.cursor-trail');
+        // --- GELİŞMİŞ MOUSE IŞIK VE TAKİP SİSTEMİ ---
+        const cursorDot = document.querySelector('.cursor-dot');
+        const root = document.documentElement;
 
         document.addEventListener('mousemove', (e) => {
-            // Ana imleç anında takip eder
-            cursor.style.left = e.pageX + 'px';
-            cursor.style.top = e.pageY + 'px';
+            // 1. Mouse pozisyonunu al
+            const x = e.clientX;
+            const y = e.clientY;
 
-            // İz bırakan efekt biraz gecikmeli gelir
-            setTimeout(() => {
-                trail.style.left = e.pageX + 'px';
-                trail.style.top = e.pageY + 'px';
-            }, 50);
+            // 2. CSS değişkenlerini güncelle (Arka plan ışığı için)
+            // Bu işlem anlıktır, gecikme yapmaz.
+            root.style.setProperty('--mouse-x', x + 'px');
+            root.style.setProperty('--mouse-y', y + 'px');
+
+            // 3. Küçük kırmızı noktayı anında taşı (Gecikmesiz)
+            cursorDot.style.left = `${x - 4}px`; // 4px, noktanın yarıçapı kadar ortalamak için
+            cursorDot.style.top = `${y - 4}px`;
         });
 
-        // Butonların üzerine gelince imleç büyüsün
-        const buttons = document.querySelectorAll('a');
-        buttons.forEach(btn => {
-            btn.addEventListener('mouseenter', () => {
-                cursor.style.transform = "translate(-50%, -50%) scale(2)";
-                cursor.style.backgroundColor = "rgba(0, 255, 65, 0.1)";
+        // Butonların üzerine gelince mouse noktası büyüsün
+        const interactiveElements = document.querySelectorAll('a, .btn');
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursorDot.style.transform = "scale(2.5)";
+                cursorDot.style.boxShadow = "0 0 30px var(--primary-red), 0 0 60px #fff";
             });
-            btn.addEventListener('mouseleave', () => {
-                cursor.style.transform = "translate(-50%, -50%) scale(1)";
-                cursor.style.backgroundColor = "transparent";
+            el.addEventListener('mouseleave', () => {
+                cursorDot.style.transform = "scale(1)";
+                cursorDot.style.boxShadow = "0 0 15px var(--primary-red), 0 0 30px var(--primary-red)";
             });
         });
     </script>
